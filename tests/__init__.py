@@ -1,6 +1,6 @@
 import test
 
-from biometric_project.capture.hand_capture import HandCapture
+from biometric_project.models.hand_capture import HandCapture
 
 
 def testMain():

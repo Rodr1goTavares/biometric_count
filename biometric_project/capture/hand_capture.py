@@ -1,22 +1,22 @@
 import cv2
-import mediapipe as mp  # Renomeado para facilitar o uso
+import mediapipe as mp
 
 class HandCapture:
-    def __init__(self):
-        self._capture = None
-        self._mp_hands = mp.solutions.hands  # Solução correta para acessar 'hands'
+    def __init__(self, connection_obj):
+        self._connection = connection_obj
+        self._cv2_video = self._connection.open_and_get_cv2()
+        self._mp_hands = mp.solutions.hands
         self._hands = self._mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=1,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
-        self._mp_drawing = mp.solutions.drawing_utils  # Solução correta para desenhar os landmarks
-
-    def startCapture(self):
-        self._capture = cv2.VideoCapture(0)
-        while self._capture.isOpened():
-            ret, frame = self._capture.read()
+        self._mp_drawing = mp.solutions.drawing_utils
+        
+    def start_capture(self):
+        while self._cv2_video.isOpened():
+            ret, frame = self._cv2_video.read()
             if not ret:
                 break
             # Convert to RGB
@@ -34,7 +34,7 @@ class HandCapture:
                     self._mp_drawing.draw_landmarks(image, hand_landmarks, self._mp_hands.HAND_CONNECTIONS)
 
                     # Contar os dedos levantados
-                    fingers = self._calcFingersPosition(hand_landmarks)
+                    fingers = self._mp_hands.calcFingersPosition(hand_landmarks)
                     cv2.putText(image, f'Dedos levantados: {fingers}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     print("Dedos levantados: " + str(fingers))
 
@@ -46,8 +46,8 @@ class HandCapture:
                 break
 
         # Liberar recursos
-        self._capture.release()
-        cv2.destroyAllWindows()
+        self._connection.close_cv2()
+        pass
 
     def _calcFingersPosition(self, hand_landmarks):
         # Índices dos dedos
