@@ -34,7 +34,7 @@ class HandCapture:
                     self._mp_drawing.draw_landmarks(image, hand_landmarks, self._mp_hands.HAND_CONNECTIONS)
 
                     # Contar os dedos levantados
-                    fingers = self._mp_hands.calcFingersPosition(hand_landmarks)
+                    fingers = self._calcFingersPosition(hand_landmarks)
                     cv2.putText(image, f'Dedos levantados: {fingers}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                     print("Dedos levantados: " + str(fingers))
 
@@ -52,24 +52,33 @@ class HandCapture:
     def _calcFingersPosition(self, hand_landmarks):
         # Índices dos dedos
         thumb_tip = hand_landmarks.landmark[self._mp_hands.HandLandmark.THUMB_TIP]
+        thumb_ip = hand_landmarks.landmark[self._mp_hands.HandLandmark.THUMB_IP]
+
         index_tip = hand_landmarks.landmark[self._mp_hands.HandLandmark.INDEX_FINGER_TIP]
+        index_dip = hand_landmarks.landmark[self._mp_hands.HandLandmark.INDEX_FINGER_DIP]
+
         middle_tip = hand_landmarks.landmark[self._mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
+        middle_dip = hand_landmarks.landmark[self._mp_hands.HandLandmark.MIDDLE_FINGER_DIP]
+
         ring_tip = hand_landmarks.landmark[self._mp_hands.HandLandmark.RING_FINGER_TIP]
+        ring_dip = hand_landmarks.landmark[self._mp_hands.HandLandmark.RING_FINGER_DIP]
+
         pinky_tip = hand_landmarks.landmark[self._mp_hands.HandLandmark.PINKY_TIP]
-    
-        # Definindo um critério simples de se o dedo está levantado:
+        pinky_dip = hand_landmarks.landmark[self._mp_hands.HandLandmark.PINKY_DIP]
+
         wrist = hand_landmarks.landmark[self._mp_hands.HandLandmark.WRIST]
     
         fingers_up = 0
-        if index_tip.y < wrist.y:
+        if thumb_tip.x > thumb_ip.x:
             fingers_up += 1
-        if middle_tip.y < wrist.y:
+
+        if index_tip.y < index_dip.y:
             fingers_up += 1
-        if ring_tip.y < wrist.y:
+        if middle_tip.y < middle_dip.y:
             fingers_up += 1
-        if pinky_tip.y < wrist.y:
+        if ring_tip.y < ring_dip.y:
             fingers_up += 1
-        if thumb_tip.x > wrist.x:
+        if pinky_tip.y < pinky_dip.y:
             fingers_up += 1
 
         return fingers_up

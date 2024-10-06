@@ -7,8 +7,9 @@ def testMain():
     pass
 
 def testHandCapture():
-    hand_capture = HandCapture()
-    hand_capture.startCapture()
+    webcam_connection = WebcamConnection()
+    hand_capture = HandCapture(webcam_connection)
+    hand_capture.start_capture()
     pass
 
 if __name__ == "__main__":
